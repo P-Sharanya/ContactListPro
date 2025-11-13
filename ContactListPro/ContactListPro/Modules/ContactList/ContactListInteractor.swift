@@ -1,15 +1,16 @@
 import Foundation
 
-final class ContactListInteractor {
-    private let storage = ContactStorage()
-    
-    func fetchContacts() -> [Contact] {
-        storage.fetch()
+final class ContactListInteractor: ContactListInteractorProtocol {
+    var presenter: ContactListPresenterProtocol?
+    private let networkHandler: NetworkHandler
+
+    init(networkHandler: NetworkHandler) {
+        self.networkHandler = networkHandler
     }
-    
-    func deleteContact(at offsets: IndexSet) {
-        var contacts = storage.fetch()
-        contacts.remove(atOffsets: offsets)
-        storage.save(contacts)
+
+    func fetchContacts() {
+        networkHandler.fetchContacts { [weak self] contacts in
+            self?.presenter?.didFetchContacts(contacts)
+        }
     }
 }

@@ -1,32 +1,61 @@
 import SwiftUI
 
 struct ContactListView: View {
-    @ObservedObject var presenter: ContactListPresenter
-    
+    @StateObject var presenter: ContactListPresenter
+    @State private var contacts: [Contact] = []
+    @State private var showEmptyMessage = true // initially show message
+
     var body: some View {
-        NavigationView {
-            List {
-                ForEach(presenter.contacts) { contact in
+        VStack {
+            if showEmptyMessage {
+                Button( action: {
+                    presenter.didTapAddContact()
+                }){
+                    Image(systemName: "plus")
+                }
+                Text("No contacts yet. Tap '+' to add new contact.")
+        
+                    .foregroundColor(.gray)
+                    .padding()
+            } else {
+                List(contacts) { contact in
                     Button(action: {
-                        presenter.contactTapped(contact)
+                        presenter.didSelectContact(contact)
                     }) {
-                        VStack(alignment: .leading) {
-                            Text(contact.name).font(.headline)
-                            Text(contact.phone).font(.subheadline).foregroundColor(.gray)
+                        HStack {
+                            Text(contact.name)
+                            Spacer()
+                            Text(contact.phone)
+                                .foregroundColor(.secondary)
                         }
                     }
                 }
-                .onDelete(perform: presenter.delete)
             }
-            .navigationTitle("Contacts")
-            .toolbar {
-                Button(action: { presenter.addButtonTapped() }) {
-                    Image(systemName: "plus")
-                }
+        }
+        .navigationTitle("Contacts")
+        .toolbar {
+            Button(action: {
+                presenter.didTapAddContact()
+            }) {
+                Image(systemName: "plus")
             }
         }
         .onAppear {
-            presenter.loadContacts()
+            presenter.view = self
+            presenter.viewDidLoad()
         }
+        .background(Color.white) // helps prevent black screen
+    }
+}
+
+extension ContactListView: ContactListViewProtocol {
+    func showContacts(_ contacts: [Contact]) {
+        self.contacts = contacts
+        self.showEmptyMessage = contacts.isEmpty
+    }
+
+    func showEmptyState() {
+        self.contacts = []
+        self.showEmptyMessage = true
     }
 }

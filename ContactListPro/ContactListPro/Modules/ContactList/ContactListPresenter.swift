@@ -1,32 +1,37 @@
 import Foundation
 
-final class ContactListPresenter: ObservableObject {
-    @Published var contacts: [Contact] = []
-    
-    private let interactor: ContactListInteractor
-    private let router: ContactListRouter
-    
-    init(interactor: ContactListInteractor, router: ContactListRouter) {
+final class ContactListPresenter: ObservableObject, ContactListPresenterProtocol {
+    var view: ContactListViewProtocol?
+    private let interactor: ContactListInteractorProtocol?
+    private let router: ContactListRouterProtocol?
+
+    @Published private(set) var contacts: [Contact] = []
+
+    init(interactor: ContactListInteractorProtocol?, router: ContactListRouterProtocol?) {
         self.interactor = interactor
         self.router = router
-        loadContacts()
     }
-    
-    func loadContacts() {
-        contacts = interactor.fetchContacts()
+
+    func viewDidLoad() {
+        interactor?.fetchContacts()
     }
-    
-    func addButtonTapped() {
-        router.presentAddContact()
+
+    func didFetchContacts(_ contacts: [Contact]) {
+        DispatchQueue.main.async {
+            self.contacts = contacts
+            if contacts.isEmpty {
+                self.view?.showEmptyState()
+            } else {
+                self.view?.showContacts(contacts)
+            }
+        }
     }
-    
-    func contactTapped(_ contact: Contact) {
-        router.presentDetail(for: contact)
+
+    func didSelectContact(_ contact: Contact) {
+        router?.navigationToContactDetail(contact: contact)
     }
-    
-    func delete(at offsets: IndexSet) {
-        interactor.deleteContact(at: offsets)
-        loadContacts() // Refresh after delete
+
+    func didTapAddContact() {
+        router?.navigationToAddContacts()
     }
 }
-

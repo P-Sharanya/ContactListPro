@@ -1,51 +1,103 @@
 import SwiftUI
 
-struct AddContactView: View {
+struct AddContactView: View, AddContactViewProtocol {
+    @StateObject var presenter: AddContactPresenter
+
     @State private var name = ""
     @State private var phone = ""
     @State private var email = ""
-    @EnvironmentObject var router: AppRouter
+
+    @State private var showAlert = false
+    @State private var alertMessage = ""
+
     
+    @State private var nameInvalid = false
+    @State private var phoneInvalid = false
+    @State private var emailInvalid = false
+
     var body: some View {
         Form {
-            Section(header: Text("Name")) {
-                TextField("Enter name", text: $name)
+            Section(header: Text("Contact Information")) {
+                VStack(alignment: .leading, spacing: 6) {
+                    HStack(spacing: 2) {
+                        Text("Name")
+                        Text("*").foregroundColor(.red)
+                    }
+                    TextField("Enter name", text: $name)
+                        .textInputAutocapitalization(.words)
+                        .padding(8)
+                        .background(nameInvalid ? Color.red.opacity(0.2) : Color.clear)
+                        .cornerRadius(6)
+                }
+
+                VStack(alignment: .leading, spacing: 6) {
+                    HStack(spacing: 2) {
+                        Text("Phone")
+                        Text("*").foregroundColor(.red)
+                    }
+                    TextField("Enter phone number", text: $phone)
+                        .keyboardType(.numberPad)
+                        .padding(8)
+                        .background(phoneInvalid ? Color.red.opacity(0.2) : Color.clear)
+                        .cornerRadius(6)
+                }
+
+                VStack(alignment: .leading, spacing: 6) {
+                    HStack(spacing: 2) {
+                        Text("Email")
+                        Text("*").foregroundColor(.red)
+                    }
+                    TextField("Enter email address", text: $email)
+                        .keyboardType(.emailAddress)
+                        .autocapitalization(.none)
+                        .padding(8)
+                        .background(emailInvalid ? Color.red.opacity(0.2) : Color.clear)
+                        .cornerRadius(6)
+                }
             }
-            Section(header: Text("Phone")) {
-                TextField("Enter phone", text: $phone)
-                    .keyboardType(.phonePad)
-            }
-            Section(header: Text("Email")) {
-                TextField("Enter email", text: $email)
-                    .keyboardType(.emailAddress)
-            }
-            
-            Button(action: saveContact) {
-                Label("Save Contact", systemImage: "tray.and.arrow.down")
-                    .frame(maxWidth: .infinity, alignment: .center)
+
+            Section {
+                Button(action: {
+                    presenter.didTapSave(name: name, phone: phone, email: email)
+                }) {
+                    Text("Save")
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 6)
+                }
+
+                Button(action: {
+                    presenter.didTapCancel()
+                }) {
+                    Text("Cancel")
+                        .foregroundColor(.red)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 6)
+                }
             }
         }
         .navigationTitle("Add Contact")
+        .onAppear {
+            presenter.view = self // 🔗 important for callbacks
+        }
+        .alert(isPresented: $showAlert) {
+            Alert(
+                title: Text("Validation Error"),
+                message: Text(alertMessage),
+                dismissButton: .default(Text("OK"))
+            )
+        }
     }
-    
-    private func saveContact() {
-        // Validate non-empty
-        guard !name.isEmpty, !phone.isEmpty, !email.isEmpty else { return }
-        
-        // Save contact
-        let storage = ContactStorage()
-        var contacts = storage.fetch()
-        let newContact = Contact(name: name, phone: phone, email: email)
-        contacts.append(newContact)
-        storage.save(contacts)
-        
-        // Clear fields
-        name = ""
-        phone = ""
-        email = ""
-        
-        // Navigate back to list
-        router.goBackToList()
+
+    // MARK: - View Protocol
+    func showValidationError(_ message: String) {
+        alertMessage = message
+        showAlert = true
+    }
+
+    func highlightInvalidFields(nameInvalid: Bool, phoneInvalid: Bool, emailInvalid: Bool) {
+        self.nameInvalid = nameInvalid
+        self.phoneInvalid = phoneInvalid
+        self.emailInvalid = emailInvalid
     }
 }
 
