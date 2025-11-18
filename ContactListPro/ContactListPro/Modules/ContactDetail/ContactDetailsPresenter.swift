@@ -5,6 +5,10 @@ final class ContactDetailPresenter: ObservableObject, ContactDetailPresenterProt
     private let interactor: ContactDetailInteractorProtocol
     private let router: ContactDetailRouterProtocol
     var view: ContactDetailViewProtocol?
+    
+    
+    var isRemote: Bool = false
+
 
     init(contact: Contact,
          interactor: ContactDetailInteractorProtocol,
@@ -12,11 +16,6 @@ final class ContactDetailPresenter: ObservableObject, ContactDetailPresenterProt
         self.contact = contact
         self.interactor = interactor
         self.router = router
-    }
-
-    func didTapDelete() {
-        interactor.deleteContact(contact)
-        router.navigateBackToContactList()
     }
 
     func didTapSaveEdit(name: String, phone: String, email: String) {
@@ -50,12 +49,26 @@ final class ContactDetailPresenter: ObservableObject, ContactDetailPresenterProt
             return
         }
 
-        // MARK: - All Valid → Save Changes
+        // MARK: - Save Changes
         contact.name = trimmedName
         contact.phone = phone
         contact.email = email
-        interactor.updateContact(contact)
-        view?.showAlert(message: "Contact updated successfully!", success: true)
+
+        do {
+            try interactor.updateContact(contact)
+            view?.showAlert(message: "Contact updated successfully!", success: true)
+        } catch {
+            view?.showAlert(message: "Failed to update contact: \(error.localizedDescription)", success: false)
+        }
     }
+    func didTapDelete() {
+        do {
+            try interactor.deleteContact(contact)
+            router.navigateBackToContactList()
+        } catch {
+            view?.showAlert(message: "Failed to delete contact: \(error.localizedDescription)", success: false)
+        }
+    }
+
 }
 

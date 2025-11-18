@@ -77,7 +77,7 @@ struct AddContactView: View, AddContactViewProtocol {
         }
         .navigationTitle("Add Contact")
         .onAppear {
-            presenter.view = self // 🔗 important for callbacks
+            presenter.view = self
         }
         .alert(isPresented: $showAlert) {
             Alert(

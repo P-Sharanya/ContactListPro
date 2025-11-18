@@ -12,12 +12,15 @@ protocol ContactListPresenterProtocol: AnyObject {
     func didSelectContact(_ contact: Contact)
     func didTapAddContact()
     func didFetchContacts(_ contacts: [Contact])
+    func didTapAPIContacts()   
+    func didFetchAPIContacts(_ contacts: [Contact])
 }
 
 // MARK: - Interactor
 protocol ContactListInteractorProtocol: AnyObject {
     func fetchContacts()
-}
+    func fetchAPIContacts()
+    }
 
 // MARK: - Router
 protocol ContactListRouterProtocol: AnyObject {
@@ -27,6 +30,6 @@ protocol ContactListRouterProtocol: AnyObject {
 
 // MARK: - Builder
 protocol ContactListBuilderProtocol {
-    static func build(navigationController: UINavigationController) -> UIViewController
+    func build(navigationController: UINavigationController) -> UIViewController
 }
 

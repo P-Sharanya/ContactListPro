@@ -3,7 +3,7 @@ import SwiftUI
 
 final class ContactListBuilder: ContactListBuilderProtocol {
 
-    static func build(navigationController: UINavigationController) -> UIViewController {
+    func build(navigationController: UINavigationController) -> UIViewController {
         
         let networkHandler = NetworkHandler()
         let interactor = ContactListInteractor(networkHandler: networkHandler)

@@ -16,31 +16,32 @@ final class ContactStorage {
         return contacts
     }
 
-    func addContact(_ contact: Contact) {
+    func addContact(_ contact: Contact) throws {
         contacts.append(contact)
-        saveContacts()
+        try saveContacts()
     }
 
-    func deleteContact(_ contact: Contact) {
+    func deleteContact(_ contact: Contact) throws {
         contacts.removeAll { $0.id == contact.id }
-        saveContacts()
+        try saveContacts()
     }
 
-    func updateContact(_ contact: Contact) {
+    func updateContact(_ contact: Contact) throws {
         if let index = contacts.firstIndex(where: { $0.id == contact.id }) {
             contacts[index] = contact
-            saveContacts()
+            try saveContacts()
         }
     }
 
     // MARK: - Persistence
 
-    private func saveContacts() {
+    private func saveContacts() throws{
         do {
             let data = try JSONEncoder().encode(contacts)
             UserDefaults.standard.set(data, forKey: userDefaultsKey)
         } catch {
-            print("❌ Failed to save contacts: \(error)")
+            throw StorageError.failedToSave(error.localizedDescription)
+
         }
     }
 
@@ -49,9 +50,19 @@ final class ContactStorage {
         do {
             contacts = try JSONDecoder().decode([Contact].self, from: data)
         } catch {
-            print("❌ Failed to load contacts: \(error)")
+
             contacts = []
         }
     }
 }
 
+enum StorageError: Error, LocalizedError {
+    case failedToSave(String)
+
+    var errorDescription: String? {
+        switch self {
+        case .failedToSave(let message):
+            return "Failed to save contacts: \(message)"
+        }
+    }
+}

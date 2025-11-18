@@ -33,9 +33,8 @@
 		58AD5D2F2EC353EC00DE7BF3 /* ContactDetailInteractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58AD5D2E2EC353EC00DE7BF3 /* ContactDetailInteractor.swift */; };
 		58AD5D312EC3542B00DE7BF3 /* ContactDetailBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58AD5D302EC3542B00DE7BF3 /* ContactDetailBuilder.swift */; };
 		58AD5D332EC3543C00DE7BF3 /* ContactDetailProtocols.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58AD5D322EC3543C00DE7BF3 /* ContactDetailProtocols.swift */; };
-		58AE444E2EC5C89E00378C0F /* ContactListProApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58AE444D2EC5C89E00378C0F /* ContactListProApp.swift */; };
-		58AE44502EC5C8D600378C0F /* RootViewControllerWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58AE444F2EC5C8D600378C0F /* RootViewControllerWrapper.swift */; };
 		58AE44522EC5E61C00378C0F /* AddContactError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58AE44512EC5E61C00378C0F /* AddContactError.swift */; };
+		58B8A1EA2EC8459C00835B6C /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58B8A1E92EC8459C00835B6C /* AppDelegate.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -66,9 +65,8 @@
 		58AD5D2E2EC353EC00DE7BF3 /* ContactDetailInteractor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactDetailInteractor.swift; sourceTree = "<group>"; };
 		58AD5D302EC3542B00DE7BF3 /* ContactDetailBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactDetailBuilder.swift; sourceTree = "<group>"; };
 		58AD5D322EC3543C00DE7BF3 /* ContactDetailProtocols.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactDetailProtocols.swift; sourceTree = "<group>"; };
-		58AE444D2EC5C89E00378C0F /* ContactListProApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactListProApp.swift; sourceTree = "<group>"; };
-		58AE444F2EC5C8D600378C0F /* RootViewControllerWrapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootViewControllerWrapper.swift; sourceTree = "<group>"; };
 		58AE44512EC5E61C00378C0F /* AddContactError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddContactError.swift; sourceTree = "<group>"; };
+		58B8A1E92EC8459C00835B6C /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -102,9 +100,8 @@
 			isa = PBXGroup;
 			children = (
 				58AD5D222EC339F100DE7BF3 /* NetworkHandler.swift */,
-				58AE444D2EC5C89E00378C0F /* ContactListProApp.swift */,
-				58AE444F2EC5C8D600378C0F /* RootViewControllerWrapper.swift */,
 				5858BE6D2EC4B32600F7AAC9 /* AppCompositionRoot.swift */,
+				58B8A1E92EC8459C00835B6C /* AppDelegate.swift */,
 				58718E192EBF6622006223E5 /* Storage */,
 				58718E1E2EBF6769006223E5 /* Modules */,
 				58718DFC2EBF63E6006223E5 /* Assets.xcassets */,
@@ -256,6 +253,7 @@
 				58718E092EBF64A3006223E5 /* ContactStorage.swift in Sources */,
 				58AD5D192EC310E000DE7BF3 /* AddContactRouter.swift in Sources */,
 				58AE44522EC5E61C00378C0F /* AddContactError.swift in Sources */,
+				58B8A1EA2EC8459C00835B6C /* AppDelegate.swift in Sources */,
 				58AD5D1F2EC3184700DE7BF3 /* ContactListBuilder.swift in Sources */,
 				58AD5D312EC3542B00DE7BF3 /* ContactDetailBuilder.swift in Sources */,
 				58AD5D152EC310BE00DE7BF3 /* AddContactInteractor.swift in Sources */,
@@ -263,13 +261,11 @@
 				58AD5D292EC3511E00DE7BF3 /* AddContactBuilder.swift in Sources */,
 				58718E072EBF6443006223E5 /* ContactListEntity.swift in Sources */,
 				58AD5D1D2EC311A500DE7BF3 /* ContactDetailsRouter.swift in Sources */,
-				58AE44502EC5C8D600378C0F /* RootViewControllerWrapper.swift in Sources */,
 				58718E0F2EBF64F3006223E5 /* ContactListRouter.swift in Sources */,
 				58AD5D172EC310D100DE7BF3 /* AddContactPresenter.swift in Sources */,
 				58718E112EBF650A006223E5 /* ContactListView.swift in Sources */,
 				58AD5D1B2EC3119100DE7BF3 /* ContactDetailsPresenter.swift in Sources */,
 				58AD5D2D2EC353D800DE7BF3 /* ContactDetailEntity.swift in Sources */,
-				58AE444E2EC5C89E00378C0F /* ContactListProApp.swift in Sources */,
 				58718E0D2EBF64E2006223E5 /* ContactListInteractor.swift in Sources */,
 				58AD5D2B2EC3512B00DE7BF3 /* AddContactProtocols.swift in Sources */,
 				58AD5D332EC3543C00DE7BF3 /* ContactDetailProtocols.swift in Sources */,
@@ -409,7 +405,6 @@
 				DEVELOPMENT_ASSET_PATHS = "\"ContactListPro/Preview Content\"";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
@@ -437,7 +432,6 @@
 				DEVELOPMENT_ASSET_PATHS = "\"ContactListPro/Preview Content\"";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";

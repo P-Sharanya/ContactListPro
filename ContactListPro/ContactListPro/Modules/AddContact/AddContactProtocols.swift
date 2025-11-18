@@ -18,8 +18,8 @@ protocol AddContactPresenterProtocol: AnyObject {
 
 // MARK: - Interactor
 protocol AddContactInteractorProtocol: AnyObject {
-    func validateContact(name: String, phone: String, email: String) -> Bool
-    func saveContact(name: String, phone: String, email: String)
+    
+    func saveContact(name: String, phone: String, email: String) throws
 }
 
 // MARK: - Router
@@ -29,5 +29,5 @@ protocol AddContactRouterProtocol: AnyObject {
 
 // MARK: - Builder
 protocol AddContactBuilderProtocol {
-    static func build(onContactAdded: @escaping () -> Void) -> UIViewController
+    func build(onContactAdded: @escaping () -> Void) -> UIViewController
 }

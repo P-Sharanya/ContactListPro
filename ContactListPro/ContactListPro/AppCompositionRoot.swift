@@ -1,9 +1,13 @@
 import UIKit
 
 final class AppCompositionRoot {
-    static func createRootViewController() -> UIViewController {
+
+     func createRootViewController() -> UIViewController {
         let navigationController = UINavigationController()
-        let contactListVC = ContactListBuilder.build(navigationController: navigationController)
+        let contactListBuilder = ContactListBuilder()
+
+        
+        let contactListVC = contactListBuilder.build(navigationController: navigationController)
         navigationController.viewControllers = [contactListVC]
         return navigationController
     }

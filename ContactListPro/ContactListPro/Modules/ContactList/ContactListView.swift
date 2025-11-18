@@ -4,7 +4,7 @@ struct ContactListView: View {
     @StateObject var presenter: ContactListPresenter
     @State private var contacts: [Contact] = []
     @State private var showEmptyMessage = true // initially show message
-
+    
     var body: some View {
         VStack {
             if showEmptyMessage {
@@ -14,7 +14,7 @@ struct ContactListView: View {
                     Image(systemName: "plus")
                 }
                 Text("No contacts yet. Tap '+' to add new contact.")
-        
+                
                     .foregroundColor(.gray)
                     .padding()
             } else {
@@ -32,19 +32,45 @@ struct ContactListView: View {
                 }
             }
         }
-        .navigationTitle("Contacts")
+        .navigationTitle(presenter.isRemoteList ? "API Contacts" : "Contacts")
         .toolbar {
-            Button(action: {
-                presenter.didTapAddContact()
-            }) {
-                Image(systemName: "plus")
+            ToolbarItem(placement: .navigationBarLeading) {
+                if presenter.isRemoteList {
+                    
+                    Button("Contacts") {
+                        presenter.loadLocalContacts()
+                    }
+                } else {
+                    
+                    Button {
+                        presenter.didTapAPIContacts()
+                    } label: {
+                        VStack{
+
+                            Text("API")
+                        }
+                        
+                    }
+                }
+            }
+            
+            ToolbarItem(placement: .navigationBarTrailing) {
+                if !presenter.isRemoteList {
+                    
+                    Button {
+                        presenter.didTapAddContact()
+                    } label: {
+                        Image(systemName: "plus")
+                    }
+                }
             }
         }
         .onAppear {
             presenter.view = self
+
             presenter.viewDidLoad()
+       
         }
-        .background(Color.white) // helps prevent black screen
     }
 }
 

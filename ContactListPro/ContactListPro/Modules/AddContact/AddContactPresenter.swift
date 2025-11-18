@@ -1,9 +1,12 @@
+
 import Foundation
 
 final class AddContactPresenter: ObservableObject, AddContactPresenterProtocol {
+
     private let interactor: AddContactInteractorProtocol
     private let router: AddContactRouterProtocol
     var view: AddContactViewProtocol?
+
     private let onContactAdded: () -> Void
 
     init(interactor: AddContactInteractorProtocol,
@@ -15,66 +18,56 @@ final class AddContactPresenter: ObservableObject, AddContactPresenterProtocol {
     }
 
     func didTapSave(name: String, phone: String, email: String) {
+
+        do {
+            try validate(name: name, phone: phone, email: email)
+            try interactor.saveContact(name: name, phone: phone, email: email)
+
+            onContactAdded()
+            router.dismiss()
+
+        } catch let error as AddContactValidationError {
+            view?.showValidationError(error.localizedDescription)
+        } catch let error as StorageError {
+            view?.showValidationError(error.localizedDescription)
+        } catch {
+            view?.showValidationError("An unexpected error occurred.")
+        }
+    }
+
+    private func validate(name: String, phone: String, email: String) throws {
+
         let trimmedName = name.trimmingCharacters(in: .whitespacesAndNewlines)
         let trimmedPhone = phone.trimmingCharacters(in: .whitespacesAndNewlines)
         let trimmedEmail = email.trimmingCharacters(in: .whitespacesAndNewlines)
 
-        var nameInvalid = false
-        var phoneInvalid = false
-        var emailInvalid = false
-
-     
-        
         if trimmedName.isEmpty {
-            nameInvalid = true
+            throw AddContactValidationError.emptyName
         }
+
         if trimmedPhone.isEmpty {
-            phoneInvalid = true
-        } else if !NSPredicate(format: "SELF MATCHES %@", "^[0-9]{10}$").evaluate(with: trimmedPhone) {
-            phoneInvalid = true
+            throw AddContactValidationError.emptyPhone
         }
+        if !trimmedPhone.matches("^[0-9]{10}$") {
+            throw AddContactValidationError.invalidPhone
+        }
+
         if trimmedEmail.isEmpty {
-            emailInvalid = true
-        } else if !NSPredicate(format: "SELF MATCHES %@", "^[0-9a-z._%+-]+@[a-z0-9.-]+\\.[a-z]{2,}$").evaluate(with: trimmedEmail) {
-            emailInvalid = true
+            throw AddContactValidationError.emptyEmail
         }
-
-      
-        view?.highlightInvalidFields(
-            nameInvalid: nameInvalid,
-            phoneInvalid: phoneInvalid,
-            emailInvalid: emailInvalid
-        )
-
-     
-        if nameInvalid {
-            view?.showValidationError("Name is required.")
-            return
+        if !trimmedEmail.matches("^[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$") {
+            throw AddContactValidationError.invalidEmail
         }
-        if phoneInvalid && trimmedPhone.isEmpty {
-            view?.showValidationError("Phone number is required.")
-            return
-        }
-        if phoneInvalid && !trimmedPhone.isEmpty {
-            view?.showValidationError("Phone number must be exactly 10 digits.")
-            return
-        }
-        if emailInvalid && trimmedEmail.isEmpty {
-            view?.showValidationError("Email address is required.")
-            return
-        }
-        if emailInvalid && !trimmedEmail.isEmpty {
-            view?.showValidationError("Please enter a valid email address.")
-            return
-        }
-
-        
-        interactor.saveContact(name: trimmedName, phone: trimmedPhone, email: trimmedEmail)
-        onContactAdded()
-        router.dismiss()
     }
 
     func didTapCancel() {
         router.dismiss()
+    }
+}
+
+extension String {
+    func matches(_ regex: String) -> Bool {
+        let predicate = NSPredicate(format: "SELF MATCHES %@", regex)
+        return predicate.evaluate(with: self)
     }
 }

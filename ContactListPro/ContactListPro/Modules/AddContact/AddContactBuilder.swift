@@ -2,7 +2,7 @@ import SwiftUI
 import UIKit
 
 final class AddContactBuilder {
-    static func build(onContactAdded: @escaping () -> Void) -> UIViewController {
+    func build(onContactAdded: @escaping () -> Void) -> UIViewController {
         let interactor = AddContactInteractor()
         let router = AddContactRouter()
         let presenter = AddContactPresenter(

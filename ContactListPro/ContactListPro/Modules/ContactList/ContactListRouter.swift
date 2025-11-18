@@ -11,7 +11,11 @@ final class ContactListRouter: ContactListRouterProtocol {
     }
 
     func navigationToAddContacts() {
-        let addContactVC = AddContactBuilder.build { [weak self] in
+        
+        let addContactBuilder = AddContactBuilder()
+
+
+        let addContactVC = addContactBuilder.build { [weak self] in
             if let hostingVC = self?.viewController as? UIHostingController<ContactListView> {
                 hostingVC.rootView.presenter.viewDidLoad()
             }
@@ -20,8 +24,11 @@ final class ContactListRouter: ContactListRouterProtocol {
     }
 
     func navigationToContactDetail(contact: Contact) {
-        let detailVC = ContactDetailBuilder.build(with: contact)
+        let contactDetailBuilder = ContactDetailBuilder()
+        
+        let detailVC = contactDetailBuilder.build(with: contact)
         navigationController?.pushViewController(detailVC, animated: true)
     }
+    
 }
 

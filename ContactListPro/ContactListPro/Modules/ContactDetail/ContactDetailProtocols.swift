@@ -17,8 +17,9 @@ protocol ContactDetailPresenterProtocol: AnyObject {
 // MARK: - Interactor
 protocol ContactDetailInteractorProtocol: AnyObject {
    
-    func deleteContact(_ contact: Contact)
-    func updateContact(_ contact: Contact)
+    func deleteContact(_ contact: Contact) throws
+
+    func updateContact(_ contact: Contact) throws
 }
 
 // MARK: - Router
@@ -29,6 +30,6 @@ protocol ContactDetailRouterProtocol: AnyObject {
 
 // MARK: - Builder
 protocol ContactDetailBuilderProtocol {
-    static func build(with contact: Contact) -> UIViewController
+    func build(with contact: Contact) -> UIViewController
 }
 
