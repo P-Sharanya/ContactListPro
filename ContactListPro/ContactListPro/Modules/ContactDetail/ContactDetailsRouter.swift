@@ -2,10 +2,11 @@ import UIKit
 
 final class ContactDetailRouter: ContactDetailRouterProtocol {
     
-    weak var viewController: UIViewController?
     weak var navigationController: UINavigationController?
     
-    init() {}
+    init(navigationController: UINavigationController? = nil) {
+        self.navigationController = navigationController
+    }
     
     func navigateBackToContactList() {
         navigationController?.popViewController(animated: true)

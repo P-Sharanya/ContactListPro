@@ -12,12 +12,15 @@ final class AddContactPresenter: ObservableObject, AddContactPresenterProtocol {
     
     private let interactor: AddContactInteractorProtocol
     private let router: AddContactRouterProtocol
-    var view: AddContactViewProtocol?
+    @Published var activeAlert: AppAlert?
+    private let refreshCallback: (() async -> Void)?
+
     
     init(interactor: AddContactInteractorProtocol,
-         router: AddContactRouterProtocol) {
+         router: AddContactRouterProtocol, refreshCallback: (() async -> Void)? = nil) {
         self.interactor = interactor
         self.router = router
+        self.refreshCallback = refreshCallback
     }
     
     // MARK: - Actions
@@ -26,13 +29,17 @@ final class AddContactPresenter: ObservableObject, AddContactPresenterProtocol {
             try validate(name: name, phone: phone, email: email)
             try interactor.saveContact(name: name, phone: phone, email: email)
             
+            Task{
+                await refreshCallback?()
+            }
+            
             router.dismiss()
-        } catch let error as AddContactValidationError {
-            view?.showValidationError(error.localizedDescription)
-        } catch let error as StorageError {
-            view?.showValidationError(error.localizedDescription)
-        } catch {
-            view?.showValidationError("An unexpected error occurred.")
+        }
+        catch let error as AddContactValidationError{
+            activeAlert = .error(error.localizedDescription)
+        }
+        catch{
+            activeAlert = .error("Failed to Save contact.")
         }
     }
     
@@ -50,14 +57,15 @@ final class AddContactPresenter: ObservableObject, AddContactPresenterProtocol {
         if trimmedName.isEmpty { throw AddContactValidationError.emptyName }
         if trimmedPhone.isEmpty { throw AddContactValidationError.emptyPhone }
    
-        if !trimmedPhone.matches("^[0-9]{10}$") {
+        if !trimmedPhone.matches(#"^\+?[\d\s\-\.\(\)]{3,}(?:\s*(?:x|ext|extension|#)\s*\d+)?$"#) {
             throw AddContactValidationError.invalidPhone
         }
         if trimmedEmail.isEmpty { throw AddContactValidationError.emptyEmail }
       
-        if !trimmedEmail.matches("^[0-9a-z._%+-]+@[a-z0-9.-]+\\.[a-z]{2,}$") {
+        if !trimmedEmail.matches("^[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$") {
             throw AddContactValidationError.invalidEmail
         }
     }
 }
+
 

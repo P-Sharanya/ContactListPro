@@ -12,10 +12,9 @@ final class ContactListBuilder: ContactListBuilderProtocol {
         
         let view = ContactListView(presenter: presenter)
         let hostingVC = UIHostingController(rootView: view)
-        router.viewController = hostingVC
-        
+    
         router.navigationController = navigationController
-        presenter.view = view
+  
         return hostingVC
     }
 }

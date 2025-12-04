@@ -7,7 +7,6 @@ final class ContactListPresenter: ObservableObject, ContactListPresenterProtocol
     @Published var contacts: [Contact] = []
     @Published var isRemoteList = false
     
-    var view: ContactListViewProtocol?
     private let interactor: ContactListInteractorProtocol
     private let router: ContactListRouterProtocol
     
@@ -18,26 +17,34 @@ final class ContactListPresenter: ObservableObject, ContactListPresenterProtocol
         self.interactor = interactor
         self.router = router
     }
+    
     // MARK: - Sorting Helper
     private func sortMerged(_ contacts: [Contact]) -> [Contact] {
         contacts.sorted { a, b in
             if a.isFromAPI == b.isFromAPI {
                 return a.name.lowercased() < b.name.lowercased()
             }
-            return a.isFromAPI == false           }
+            return a.isFromAPI == false
+        }
     }
     
     // MARK: - Entry
-    func viewDidLoad() {
+   func viewDidLoad() {
         loadingState = .idle
+        
+        // If API contacts are already loaded, just merge and show
+        if !apiContacts.isEmpty || !localContacts.isEmpty {
+            mergeAndDisplayContacts()
+            return
+        }
+        
         Task {
-          
             try? await Task.sleep(nanoseconds: 200_000_000)
             let placeholders = Array(repeating: Contact(name: "Loading...", phone: "------", email: "-----"), count: 6)
             await MainActor.run {
                 self.loadingState = .loading(placeholders)
             }
-         
+            
             do {
                 let fetchedAPI = try await interactor.fetchAPIContacts()
                 await MainActor.run {
@@ -46,8 +53,6 @@ final class ContactListPresenter: ObservableObject, ContactListPresenterProtocol
                         c.isFromAPI = true
                         return c
                     }
-                    self.contacts = self.apiContacts
-                    self.loadingState = .loaded(self.contacts)
                 }
             } catch {
                 await MainActor.run {
@@ -55,28 +60,50 @@ final class ContactListPresenter: ObservableObject, ContactListPresenterProtocol
                 }
             }
             
+            // Always fetch local contacts to check for changes
             let local = await interactor.fetchLocalContacts()
             await MainActor.run {
                 self.localContacts = local
-                var merged: [Contact] = []
-                merged.append(contentsOf: self.localContacts)
-                let apiFiltered = self.apiContacts.filter { api in
-                    !self.localContacts.contains(where: { $0.id == api.id })
+                self.mergeAndDisplayContacts()
+            }
+        }
+    }
+
+    private func mergeAndDisplayContacts() {
+        var merged: [Contact] = []
+        merged.append(contentsOf: self.localContacts)
+        merged.append(contentsOf: self.apiContacts.filter { api in
+            !self.localContacts.contains(where: { $0.id == api.id })
+        })
+        let sorted = self.sortMerged(merged)
+        self.contacts = sorted
+        self.loadingState = .loaded(sorted)
+        
+    }
+    
+ 
+
+    func didConfirmDelete(_ contact: Contact) {
+        activeAlert = nil
+        
+        Task {
+            do {
+              
+                try interactor.deleteContact(contact)
+
+                await MainActor.run {
+                    activeAlert = .success("Contact deleted successfully")
+                    self.localContacts.removeAll(where: { $0.id == contact.id })
+                    self.mergeAndDisplayContacts()
                 }
-                merged.append(contentsOf: apiFiltered)
-                let sorted = self.sortMerged(merged)
-                self.contacts = sorted
-                self.loadingState = .loaded(sorted)
-                if sorted.isEmpty {
-                    self.view?.showEmptyState()
-                } else {
-                    self.view?.showContacts(sorted)
+
+            } catch {
+                await MainActor.run {
+                    self.activeAlert = .error("Failed to delete contact.")
                 }
             }
         }
     }
-    
-    // MARK: - Toolbar behavior / actions
     func didTapAPIContacts() {
         isRemoteList = true
         viewDidLoad()
@@ -88,59 +115,34 @@ final class ContactListPresenter: ObservableObject, ContactListPresenterProtocol
             let local = await interactor.fetchLocalContacts()
             await MainActor.run {
                 self.localContacts = local
-                var merged: [Contact] = []
-                merged.append(contentsOf: self.localContacts)
-                merged.append(contentsOf: self.apiContacts.filter { api in
-                    !self.localContacts.contains(where: { $0.id == api.id })
-                })
-                let sorted = self.sortMerged(merged)
-                self.contacts = sorted
-                self.loadingState = .loaded(sorted)
-                if sorted.isEmpty {
-                    self.view?.showEmptyState()
-                } else {
-                    self.view?.showContacts(sorted)
-                }
+                mergeAndDisplayContacts()
             }
         }
     }
     
     // MARK: - Navigation to detail
     func didSelectContact(_ contact: Contact) {
-        let detailInteractor = ContactDetailInteractor()
-        let detailRouter = ContactDetailRouter()
-        detailRouter.navigationController = router.navigationController
-        let detailPresenter = ContactDetailPresenter(
-            contact: contact,
-            interactor: detailInteractor,
-            router: detailRouter,
-            refreshListCallback: { [weak self] in
-                await self?.refreshAfterDelete()
-            }
-        )
-        router.navigationToContactDetail(presenter: detailPresenter)
+        router.navigationToContactDetail(contact, refreshCallback: { [weak self] in
+            await self?.refreshAfterDelete()
+        })
+
     }
 
     func didTapAddContact() {
-        router.navigationToAddContacts()
+        router.navigationToAddContacts { [weak self] in
+            await self?.refreshAfterAdd()
+        }
     }
-    
+    func requestDelete(_ contact: Contact) {
+        activeAlert = .confirmDelete(contact)
+    }
     // MARK: - Refresh flows
     func refreshAfterAdd() {
         Task {
             let local = await interactor.fetchLocalContacts()
             await MainActor.run {
                 self.localContacts = local
-                var merged: [Contact] = []
-                merged.append(contentsOf: self.localContacts)
-                merged.append(contentsOf: self.apiContacts.filter { api in
-                    !self.localContacts.contains(where: { $0.id == api.id })
-                })
-                let sorted = self.sortMerged(merged)
-                self.contacts = sorted
-                self.loadingState = .loaded(sorted)
-                if sorted.isEmpty { self.view?.showEmptyState() }
-                else { self.view?.showContacts(sorted) }
+                mergeAndDisplayContacts()
             }
         }
     }
@@ -149,16 +151,7 @@ final class ContactListPresenter: ObservableObject, ContactListPresenterProtocol
         let local = await interactor.fetchLocalContacts()
         await MainActor.run {
             self.localContacts = local
-            var merged: [Contact] = []
-            merged.append(contentsOf: self.localContacts)
-            merged.append(contentsOf: self.apiContacts.filter { api in
-                !self.localContacts.contains(where: { $0.id == api.id })
-            })
-            let sorted = self.sortMerged(merged)
-            self.contacts = sorted
-            self.loadingState = .loaded(sorted)
-            if sorted.isEmpty { self.view?.showEmptyState() }
-            else { self.view?.showContacts(sorted) }
+            mergeAndDisplayContacts()
         }
     }
 }

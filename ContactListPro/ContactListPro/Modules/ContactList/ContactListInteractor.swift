@@ -14,4 +14,8 @@ final class ContactListInteractor: ContactListInteractorProtocol {
     func fetchAPIContacts() async throws -> [Contact] {
         return try await networkHandler.fetchAPIContacts()
     }
+    func deleteContact(_ contact: Contact) throws {
+        try ContactStorage.shared.deleteContact(contact)
+        }
+
 }

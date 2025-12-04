@@ -25,8 +25,7 @@ protocol ContactDetailRouterProtocol: AnyObject {
 
 // MARK: - Builder
 protocol ContactDetailBuilderProtocol {
-    func build(with contact: Contact, presenter: ContactDetailPresenter) -> UIViewController
-    func build(with contact: Contact) -> UIViewController
+    func build(contact: Contact, navigationController: UINavigationController?, refreshCallback: (() async -> Void)?) -> UIViewController
 }
 
 

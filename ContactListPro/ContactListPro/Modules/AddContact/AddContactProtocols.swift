@@ -2,12 +2,7 @@ import Foundation
 import UIKit
 // MARK: - View
 protocol AddContactViewProtocol {
-    func showValidationError(_ message: String)
-    func highlightInvalidFields(
-        nameInvalid: Bool,
-        phoneInvalid: Bool,
-        emailInvalid: Bool
-    )
+
 }
 
 // MARK: - Presenter

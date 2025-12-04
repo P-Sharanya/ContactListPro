@@ -7,11 +7,5 @@ final class AddContactRouter: AddContactRouterProtocol {
     
     func dismiss() {
         navigationController?.popViewController(animated: true)
-       
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
-            if let top = self.navigationController?.topViewController as? UIHostingController<ContactListView> {
-                top.rootView.presenter.refreshAfterAdd()
-            }
-        }
     }
 }

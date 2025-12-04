@@ -1,14 +1,12 @@
 import SwiftUI
 
 struct AddContactView: View, AddContactViewProtocol {
+  
     
     @StateObject var presenter: AddContactPresenter
     @State private var name = ""
     @State private var phone = ""
     @State private var email = ""
-    
-    @State private var showAlert = false
-    @State private var alertMessage = ""
     
     @State private var nameInvalid = false
     @State private var phoneInvalid = false
@@ -72,27 +70,29 @@ struct AddContactView: View, AddContactViewProtocol {
         }
         .navigationTitle("Add Contact")
         .onAppear {
-            presenter.view = self
         }
-        .alert(isPresented: $showAlert) {
-            Alert(
-                title: Text("Validation Error"),
-                message: Text(alertMessage),
-                dismissButton: .default(Text("OK"))
-            )
+        .alert(item: $presenter.activeAlert) { alert in
+            switch alert {
+            case .error(let message):
+                return Alert(
+                    title: Text("Error"),
+                    message: Text(message),
+                    dismissButton: .default(Text("OK"))
+                )
+
+            case .success(let message):
+                return Alert(
+                    title: Text("Success"),
+                    message: Text(message),
+                    dismissButton: .default(Text("OK"))
+                )
+
+            default:
+                return Alert(title: Text(""))
+            }
         }
     }
-    
-    // MARK: - View Protocol
-    func showValidationError(_ message: String) {
-        alertMessage = message
-        showAlert = true
-    }
-    
-    func highlightInvalidFields(nameInvalid: Bool, phoneInvalid: Bool, emailInvalid: Bool) {
-        self.nameInvalid = nameInvalid
-        self.phoneInvalid = phoneInvalid
-        self.emailInvalid = emailInvalid
-    }
+
 }
+
 

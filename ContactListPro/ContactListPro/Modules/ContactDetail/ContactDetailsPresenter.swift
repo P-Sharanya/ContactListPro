@@ -32,15 +32,15 @@ final class ContactDetailPresenter: ObservableObject, ContactDetailPresenterProt
             activeAlert = .error("Phone number is required.")
             return
         }
-        if !trimmedPhone.matches("^[0-9]{10}$") {
-            activeAlert = .error("Phone number must contain exactly 10 digits.")
+        if !trimmedPhone.matches(#"^\+?[\d\s\-\.\(\)]{3,}(?:\s*(?:x|ext|extension|#)\s*\d+)?$"#) {
+            activeAlert = .error("Invalid Phone number format")
             return
         }
         if trimmedEmail.isEmpty {
             activeAlert = .error("Email is required.")
             return
         }
-        if !trimmedEmail.matches("^[0-9a-z._%+-]+@[a-z0-9.-]+\\.[a-z]{2,}$") {
+        if !trimmedEmail.matches("^[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$") {
             activeAlert = .error("Enter a valid email address.")
             return
         }
@@ -56,6 +56,9 @@ final class ContactDetailPresenter: ObservableObject, ContactDetailPresenterProt
             try interactor.updateContact(updated)
             self.contact = updated
             self.activeAlert = .success("Contact updated successfully.")
+            Task{
+                await refreshListCallback?()
+            }
         } catch {
             self.activeAlert = .error("Failed to update contact.")
         }
@@ -84,3 +87,4 @@ final class ContactDetailPresenter: ObservableObject, ContactDetailPresenterProt
         router.navigateBackToContactList()
     }
 }
+

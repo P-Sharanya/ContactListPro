@@ -2,16 +2,14 @@ import UIKit
 import SwiftUI
 
 final class AddContactBuilder {
-    func build(navigationController: UINavigationController?) -> UIViewController {
+    func build(navigationController: UINavigationController?,refreshCallback: (() async -> Void)? = nil) -> UIViewController {
         let interactor = AddContactInteractor()
         let router = AddContactRouter()
-        let presenter = AddContactPresenter(interactor: interactor, router: router)
+        let presenter = AddContactPresenter(interactor: interactor, router: router, refreshCallback: refreshCallback)
         
         let view = AddContactView(presenter: presenter)
-        presenter.view = view
-        
+
         let hostingVC = UIHostingController(rootView: view)
-        router.viewController = hostingVC
         
         router.navigationController = navigationController
         return hostingVC
