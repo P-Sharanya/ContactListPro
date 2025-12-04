@@ -32,7 +32,6 @@ final class ContactListPresenter: ObservableObject, ContactListPresenterProtocol
    func viewDidLoad() {
         loadingState = .idle
         
-        // If API contacts are already loaded, just merge and show
         if !apiContacts.isEmpty || !localContacts.isEmpty {
             mergeAndDisplayContacts()
             return
@@ -59,8 +58,7 @@ final class ContactListPresenter: ObservableObject, ContactListPresenterProtocol
                     self.loadingState = .error("Failed to load API contacts.", true)
                 }
             }
-            
-            // Always fetch local contacts to check for changes
+           
             let local = await interactor.fetchLocalContacts()
             await MainActor.run {
                 self.localContacts = local
