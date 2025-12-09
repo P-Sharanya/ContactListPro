@@ -16,27 +16,60 @@ struct ContactDetailView: View, ContactDetailViewProtocol {
     var body: some View {
         VStack {
             if isEditing {
-                Form {
-                    labeledField("Name", text: $name)
-                    labeledField("Phone", text: $phone)
-                    labeledField("Email", text: $email)
-                    Section {
+                let color = fixedColor(for: presenter.contact)
+                HStack (alignment: .center){
+                    Spacer()
+                    Circle()
+                        .fill(color.opacity(0.15))
+                        .frame(width: 90, height: 90)
+                        .overlay(
+                            Text(String(presenter.contact.name.prefix(1)))
+                                .font(.largeTitle)
+                                .foregroundColor(color)
+                        )
+                        .padding()
+                    Spacer()
+                }
+               
+                VStack(alignment: .center, spacing: 20){
+                    labeledField("Name", icon: "person", text: $name)
+                    labeledField("Phone", icon: "phone", text: $phone)
+                    labeledField("Email", icon: "envelope", text: $email)
+
                         Button {
                             presenter.didTapSaveEdit(name: name, phone: phone, email: email)
                         } label: {
                             Text("Save Changes").frame(maxWidth: .infinity)
+                                .padding() .background(Color(.secondarySystemBackground))
+                                .foregroundColor(.blue)
+                                .cornerRadius(10)
+                                
                         }
-                    }
+                    
                 }
-            } else {
-                VStack(alignment: .leading, spacing: 20) {
+                .padding(.horizontal)
+                .padding(.top, 10)
+                
+            }   else {
+                VStack(alignment: .center, spacing: 20) {
+                    let color = fixedColor(for: presenter.contact)
+                    Circle()
+                        .fill(color.opacity(0.15))
+                        .frame(width: 90, height: 90)
+                        .overlay(
+                            Text(String(presenter.contact.name.prefix(1)))
+                                .font(.largeTitle)
+                                .foregroundColor(color)
+                        )
+                    
                     infoRow(title: "Name", value: presenter.contact.name)
                     infoRow(title: "Phone", value: presenter.contact.phone)
                     infoRow(title: "Email", value: presenter.contact.email)
                 }
                 .padding(.horizontal)
-                Spacer()
+
             }
+            Spacer()
             
             if !isEditing {
                 Button(role: .destructive) {
@@ -105,9 +138,13 @@ struct ContactDetailView: View, ContactDetailViewProtocol {
     }
     
     // MARK: - Helper UI funcs
-    private func labeledField(_ label: String, text: Binding<String>) -> some View {
+    private func labeledField(_ label: String, icon: String, text: Binding<String>) -> some View {
         VStack(alignment: .leading, spacing: 6) {
-            Text(label).font(.subheadline).foregroundColor(.gray)
+            HStack(spacing: 4) {
+                Image(systemName: icon)
+                Text(label)
+            }
+            .font(.headline).foregroundColor(.gray)
             TextField(label, text: text)
                 .padding(8)
                 .background(Color(.secondarySystemBackground))
@@ -117,10 +154,19 @@ struct ContactDetailView: View, ContactDetailViewProtocol {
     }
     
     private func infoRow(title: String, value: String) -> some View {
-        VStack(alignment: .leading, spacing: 4) {
-            Text(title).font(.caption).foregroundColor(.gray)
-            Text(value).font(.body).foregroundColor(.secondary)
+        VStack(alignment: .center, spacing: 4) {
+            Text(title).font(.body).foregroundColor(.blue)
+            Text(value).font(.headline).foregroundColor(.black)
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
+        .frame(maxWidth: .infinity, alignment: .center)
     }
+    
+    private func fixedColor(for contact: Contact) -> Color {
+        let colors: [Color] = [
+            .blue, .green, .orange, .purple, .pink, .red, .teal, .indigo
+        ]
+        let hash = abs(contact.id.uuidString.hashValue)
+        return colors[hash % colors.count]
+    }
+
 }

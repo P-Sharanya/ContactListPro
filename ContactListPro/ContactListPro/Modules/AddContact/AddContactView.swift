@@ -14,12 +14,13 @@ struct AddContactView: View, AddContactViewProtocol {
     
     var body: some View {
         Form {
-            Section(header: Text("Contact Information")) {
+            Section(header: Text("Contact Information").font(.subheadline)) {
                 VStack(alignment: .leading, spacing: 6) {
                     HStack(spacing: 2) {
+                        Image(systemName: "person")
                         Text("Name")
                         Text("*").foregroundColor(.red)
-                    }
+                    }.font(.headline)
                     TextField("Enter name", text: $name)
                         .textInputAutocapitalization(.words)
                         .padding(8)
@@ -28,9 +29,10 @@ struct AddContactView: View, AddContactViewProtocol {
                 }
                 VStack(alignment: .leading, spacing: 6) {
                     HStack(spacing: 2) {
+                        Image(systemName: "phone")
                         Text("Phone")
                         Text("*").foregroundColor(.red)
-                    }
+                    }.font(.headline)
                     TextField("Enter phone number", text: $phone)
                         .keyboardType(.numberPad)
                         .padding(8)
@@ -39,9 +41,10 @@ struct AddContactView: View, AddContactViewProtocol {
                 }
                 VStack(alignment: .leading, spacing: 6) {
                     HStack(spacing: 2) {
+                        Image(systemName: "envelope")
                         Text("Email")
                         Text("*").foregroundColor(.red)
-                    }
+                    }.font(.headline)
                     TextField("Enter email address", text: $email)
                         .keyboardType(.emailAddress)
                         .autocapitalization(.none)
@@ -68,7 +71,7 @@ struct AddContactView: View, AddContactViewProtocol {
                 }
             }
         }
-        .navigationTitle("Add Contact")
+        .navigationTitle("Add Contact").font(.title2)
         .onAppear {
         }
         .alert(item: $presenter.activeAlert) { alert in

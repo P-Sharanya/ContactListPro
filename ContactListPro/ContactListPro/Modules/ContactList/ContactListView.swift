@@ -123,9 +123,20 @@ struct ContactListView: View {
                 }
                 
             } else {
+                
                 List(contacts, id: \.id) { contact in
                     Button(action: { presenter.didSelectContact(contact) }) {
                         HStack {
+                            ZStack{
+                                let color = fixedColor(for: contact)
+                                Circle()
+                                    .fill(color.opacity(0.15))
+                                    .frame(width: 42, height: 42)
+                                
+                            Text(String(contact.name.prefix(1)))
+                                .font(.title3)
+                                .foregroundColor(color)
+                        }
                             VStack(alignment: .leading, spacing: 4) {
                                 Text(contact.name).font(.headline)
                                 Text(contact.email).font(.caption).foregroundColor(.secondary)
@@ -154,6 +165,9 @@ struct ContactListView: View {
         var body: some View{
             VStack(spacing: 16) {
                 Spacer()
+                Image(systemName: "exclamationmark.triangle.fill")
+                    .font(.system(size: 40))
+                    .foregroundColor(.orange)
                 Text(message).foregroundColor(.red)
                     .multilineTextAlignment(.center)
                     .padding(.horizontal)
@@ -166,3 +180,11 @@ struct ContactListView: View {
             }
         }
     }
+private func fixedColor(for contact: Contact) -> Color {
+    let colors: [Color] = [
+        .blue, .green, .orange, .purple, .pink, .red, .teal, .indigo,.yellow,.brown,.black
+    ]
+    let hash = abs(contact.id.uuidString.hashValue)
+    return colors[hash % colors.count]
+}
+
